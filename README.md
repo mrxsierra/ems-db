@@ -8,7 +8,8 @@ Let's walk through each relationship and especially the more complex ones like *
 
 ### 👤 `STUDENTS` — `TESTS_SESSIONS`
 ```mermaid
-STUDENTS ||--|| TESTS_SESSIONS : "takes"
+erDiagram
+    STUDENTS ||--|| TESTS_SESSIONS : "takes"
 ```
 - Each **student** takes exactly one **test session** per test.
 - Each **test session** belongs to one student.
@@ -17,7 +18,8 @@ STUDENTS ||--|| TESTS_SESSIONS : "takes"
 
 ### 📘 `TESTS` — `QUESTIONS`
 ```mermaid
-TESTS ||--|{ QUESTIONS : "has"
+erDiagram
+    TESTS ||--|{ QUESTIONS : "has"
 ```
 - A test can have many questions.
 - Each question belongs to one test.
@@ -26,7 +28,8 @@ TESTS ||--|{ QUESTIONS : "has"
 
 ### ❓ `QUESTIONS` — `QUESTIONS_OPTIONS`
 ```mermaid
-QUESTIONS ||--o{ QUESTIONS_OPTIONS : "has"
+erDiagram
+    QUESTIONS ||--o{ QUESTIONS_OPTIONS : "has"
 ```
 - A question can have multiple answer options.
 - Each option is tied to one question.
@@ -35,7 +38,8 @@ QUESTIONS ||--o{ QUESTIONS_OPTIONS : "has"
 
 ### 📝 `RESULTS` — `QUESTIONS` / `QUESTIONS_OPTIONS`
 ```mermaid
-RESULTS ||--|| QUESTIONS : "generated"
+erDiagram
+    RESULTS ||--|| QUESTIONS : "generated"
 RESULTS ||--|{ QUESTIONS_OPTIONS : "answer"
 ```
 - Each result is linked to one question (the one being answered).
@@ -45,7 +49,8 @@ RESULTS ||--|{ QUESTIONS_OPTIONS : "answer"
 
 ### 🧑‍🎓 `TESTS_SESSIONS` — `RESULTS` / `REPORTS`
 ```mermaid
-TESTS_SESSIONS ||--o{ RESULTS : "has"
+erDiagram
+    TESTS_SESSIONS ||--o{ RESULTS : "has"
 TESTS_SESSIONS ||--|| REPORTS : "generates"
 ```
 - One test session has many results (per question).
@@ -57,7 +62,8 @@ TESTS_SESSIONS ||--|| REPORTS : "generates"
 
 ### 🛡️ `PROCTORS` — `PROCTORING_SESSIONS`
 ```mermaid
-PROCTORS }|--|{ PROCTORING_SESSIONS : "supervises"
+erDiagram
+    PROCTORS }|--|{ PROCTORING_SESSIONS : "supervises"
 ```
 - A **many-to-many** relationship (represented as 1..* both sides).
 - A proctor can participate in many **proctoring sessions** (e.g., rotating roles).
@@ -69,7 +75,8 @@ PROCTORS }|--|{ PROCTORING_SESSIONS : "supervises"
 
 ### 🎥 `PROCTORING_SESSIONS` — `TESTS_SESSIONS`
 ```mermaid
-PROCTORING_SESSIONS ||--o{ TESTS_SESSIONS : "monitor"
+erDiagram
+    PROCTORING_SESSIONS ||--o{ TESTS_SESSIONS : "monitor"
 ```
 - A proctoring session can monitor multiple test sessions (e.g., group of students).
 - Each test session can be observed under one or more proctoring sessions.
@@ -78,7 +85,8 @@ PROCTORING_SESSIONS ||--o{ TESTS_SESSIONS : "monitor"
 
 ### 🧾 `PROCTORING_SESSIONS` — `EVENTS`
 ```mermaid
-PROCTORING_SESSIONS ||--o{ EVENTS : "records"
+erDiagram
+    PROCTORING_SESSIONS ||--o{ EVENTS : "records"
 ```
 - Events are tied to proctoring sessions.
 - These events are automatically triggered (via system rules and triggers).
