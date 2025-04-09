@@ -1,0 +1,111 @@
+---
+title: Exam Management Database
+config:
+    layout: elk
+---
+erDiagram
+    direction LR
+    STUDENT {
+        INTEGER id PK
+        TEXT first_name
+        TEXT last_name
+        TEXT password
+        TEXT email
+    }
+
+    TEST {
+        INTEGER id PK
+        TEXT title
+        TEXT description
+        NUMERIC duration
+        TEXT instructions
+        TEXT course
+    }
+
+    QUESTION {
+        INTEGER id PK
+        INTEGER test_id FK
+        TEXT question
+        TEXT type
+        TEXT topic
+        NUMERIC duration
+    }
+
+    QUESTION_OPTION {
+        INTEGER id PK
+        INTEGER question_id FK
+        TEXT option
+        INTEGER is_correct
+    }
+
+    TEST_SESSION {
+        INTEGER id PK
+        INTEGER test_id FK
+        INTEGER student_id FK
+        NUMERIC start
+        NUMERIC end
+        NUMERIC duration_taken
+        TEXT status
+    }
+
+    PROCTOR {
+        INTEGER id PK
+        TEXT first_name
+        TEXT last_name
+        TEXT password
+        TEXT email
+    }
+
+    PROCTORING_SESSION {
+        INTEGER id PK
+        INTEGER proctor_id FK
+        INTEGER test_session_id FK
+        NUMERIC start
+        NUMERIC end
+        TEXT status
+    }
+
+    EVENT {
+        INTEGER id PK
+        INTEGER proctoring_session_id FK
+        TEXT type "From Triggers and Other Means"
+        NUMERIC timestamp
+        TEXT description "From Triggers and Other Means"
+    }
+
+    RESULT {
+        INTEGER id PK
+        INTEGER test_session_id FK
+        INTEGER question_id FK
+        INTEGER answer FK "Ref. question options id"
+        INTEGER score
+        TEXT feedback
+    }
+
+    REPORT {
+        INTEGER id PK
+        INTEGER test_session_id FK
+        INTEGER total_score
+        INTEGER final_score
+        TEXT overall_feedback
+    }
+
+    STUDENT ||--|| TEST_SESSION : "takes"
+
+    TEST ||--|{ QUESTION : "has"
+    QUESTION ||--o{ QUESTION_OPTION : "has"
+
+    RESULT ||--|| QUESTION : "attempted"
+    RESULT ||--|{ QUESTION_OPTION : "logs answer"
+    
+    TEST_SESSION ||--|| TEST : "has"
+    TEST_SESSION ||--o{ RESULT : "results logged"
+    TEST_SESSION ||--|| REPORT : "generated"
+
+    PROCTOR }|--|{ PROCTORING_SESSION : "supervises"
+    PROCTORING_SESSION ||--o{ TEST_SESSION : "monitored"
+    PROCTORING_SESSION ||--o{ EVENT: "records logged"
+
+style PROCTOR fill:#ff1,stroke:#333,stroke-width:4px
+style STUDENT fill:#1af,stroke:#333,stroke-width:4px
+style REPORT fill:#f51,stroke:#333,stroke-width:4px
