@@ -186,7 +186,7 @@ BEGIN
         "feedback" =
         CASE
             WHEN (SELECT "is_correct" FROM "questions_options" WHERE "id" = NEW.answer) = 0 THEN 'need-improvement'
-            ELSE "great"
+            ELSE 'great'
         END
     WHERE "id" = NEW.id;
 END;

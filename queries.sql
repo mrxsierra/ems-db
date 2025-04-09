@@ -139,4 +139,4 @@ WHERE "is_correct" = 1;
 -- Find all test sessions of suspicious beahviour
 -- EXPLAIN QUERY PLAN
 SELECT * FROM "test_sessions_suspicious_behaviour_search"
-WHERE "status" = 'ended';
+WHERE "test_session_status" = 'ended';

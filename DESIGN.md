@@ -174,7 +174,7 @@ All insertion in `reports` handled by trigger (`update_status_end_final_score_al
 
 The below entity relationship diagram describes the relationships among the entities in the database.
 
-![ER Diagram](erDiagram.png)
+![ER Diagram](erDiagram-old.png)
 
 As detailed by the diagram:
 
@@ -188,19 +188,17 @@ As detailed by the diagram:
 * one proctoring session is monitored by one proctor while proctor can monitor 0 or many proctoring session.
 * One proctoring session records 0 or many reports while One event has one proctoring session.
 
-
 ## Optimizations
-
 
 Several optimizations were made in the schema:
 
-* Indexes:
-   - Indexes were created on various columns used frequently in queries to improve query performance. For example, indexes were added on columns like `student_id`, `test_id`, `question_id`, `is_correct`, etc. many other mentioned in in `schema.sql` for other table, based on several query mentioned in `queries.sql` can be seen their.
-   - The purpose of adding indexes is to speed up common search operations, especially when filtering or joining large datasets.
+* Indexes:  
+  * Indexes were created on various columns used frequently in queries to improve query performance. For example, indexes were added on columns like `student_id`, `test_id`, `question_id`, `is_correct`, etc. many other mentioned in in `schema.sql` for other table, based on several query mentioned in `queries.sql` can be seen their.
+  * The purpose of adding indexes is to speed up common search operations, especially when filtering or joining large datasets.
 
 * Views:
-   - Views were created to simplify querying for common tasks. For example, the `tests_history` view provides a consolidated view of students' test performance history, while the `test_questions_option_search` view simplifies searching for tests and their associated questions and options and `test_sessions_suspicious_behaviour_search` view provides tests sessions where suspicious activity occured.
-   - This views help in abstracting complex queries into simpler, reusable forms, enhancing the database's usability and reducing the complexity of queries for end-users.
+  * Views were created to simplify querying for common tasks. For example, the `tests_history` view provides a consolidated view of students' test performance history, while the `test_questions_option_search` view simplifies searching for tests and their associated questions and options and `test_sessions_suspicious_behaviour_search` view provides tests sessions where suspicious activity occured.
+  * This views help in abstracting complex queries into simpler, reusable forms, enhancing the database's usability and reducing the complexity of queries for end-users.
 
 These optimizations were implemented to improve the overall performance and usability of the database system by reducing query execution time and simplifying the querying process.
 
