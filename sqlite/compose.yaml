@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.13}
+        DEV_UID: ${USERID:-1000} # Use host user ID for better file permissions
+        DEV_GID: ${GROUPID:-1000} # Use host group ID
+    command: ["tail", "-f", "/dev/null"]
+    # env_file:
+      # - .env
+    volumes:
+      - .:/app:rw # Mount project for live updates
+      - dev-venv-ems-sqlite:/app/.venv # Named volume for the virtual environment
+    working_dir: /app
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - .git/
+            - .venv/
+            - __pycache__/
+            - .dockerignore
+            - .gitignore
+            - Dockerfile
+            - compose.yaml
+            - README*.md
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./uv.lock
+
+volumes:
+  dev-venv-ems-sqlite: # Define the named volume for the virtual environment

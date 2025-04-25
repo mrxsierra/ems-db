@@ -1,0 +1,12 @@
+# *-old.png
+*.db
+*.venv
+*.egg-info
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg
+.python-version
+*.DS_Store
+*.log
