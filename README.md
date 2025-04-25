@@ -1,10 +1,61 @@
 # **Exam Management System**
 
-Let's walk through each relationship and especially the more complex ones like **PROCTORING_SESSIONS** and how it links to **PROCTORS**, **TESTS_SESSIONS**, and **EVENTS**.
+The Exam Management System database is designed to streamline the process of conducting tests and examinations. It encompasses all essential entities required for creating and managing tests, proctoring test-takers, and generating detailed results and performance reports. The system ensures efficient administration and monitoring while maintaining traceability and flexibility.
 
-## ✅ Diagram Structure Overview
+## Project Structural Overview
 
-![ER-Diagram](erDiagram.png)
+### **Directory Structure**
+
+```sh
+ems-db:             # root {WorkDir}
+├───assets          # MISC          
+├───mysql
+├───psql
+├───sqlite
+├───DESIGN.md       # Schema Def
+├───design.mmd      # Mermaid Schema def
+└───README.md
+```
+
+```sh
+# Common Files
+WorkDir: root/[sqlite, mysql, psql]
+    |- .dockerignore        ---   
+    |- .gitignore             |  
+    |- .python-version        |
+    |- compose.yaml           |-- # ENV files
+    |- Dockerfile             |
+    |- pyproject.toml         |
+    |- uv.lock              __|
+    |- db.py                # Script
+    |- queries.sql          # Batch queries         
+    |- schema.sql           # Schema def
+    |- README.Docker.md     <-- # Read for docker
+    |- usage.md             <-- # start here
+```
+
+- **SQLite**, **MySQL**, and **PostgreSQL** folders contain database-specific implementations.
+- Shared files like `db.py`, `queries.sql`, and `schema.sql` provide a consistent interface across all databases.
+- This structure simplifies navigation and ensures modularity for multi-database support.
+
+## ✨ Project Scope and Objectives
+
+The database is tailored to handle the core processes of test management, including creating test sets with multiple-choice questions, proctoring test sessions, and producing performance reports. However, its scope is intentionally focused and does not cover broader educational management aspects such as user activity logging, notifications, financial transactions, subjective answer types, or other administrative features.
+
+### Key Highlights
+
+- **Core Focus:** Efficiently manage tests, proctoring, and result generation.
+- **Traceability:** Maintain clear relationships between students, tests, sessions, and results.
+- **Flexibility:** Support complex proctoring scenarios and large-scale test monitoring.
+- **Modularity:** Designed for multi-database support with consistent file structures.
+
+> ***Read*** [`design.md`](design.md) `<<<` For more details.
+
+## 🤔 Structural Overview
+
+The following sections provide a detailed walkthrough of the database relationships, with special emphasis on complex entities like **PROCTORING_SESSIONS** and their connections to **PROCTORS**, **TESTS_SESSIONS**, and **EVENTS**.
+
+![ER-Diagram](assets/erDiagram.png)
 
 ---
 
@@ -111,12 +162,40 @@ erDiagram
   - `started-test`, `suspicious-behavior`, `ended-test`, etc.
 - Useful for auditing and monitoring behavior during tests.
 
----
-
-## 🧠 Why This Works
+## 🧠 How This Works
 
 - Ensures traceability from:
   - Student → Test → Test Session → Question → Answer (Result)
   - Proctor → Proctoring Session → Event (Audit Trail)
 - Supports flexible supervision and large-scale test monitoring.
 - Works well with database schema and the logic described (including triggers, views, etc.).
+
+## 📗 Usage
+
+> ***First :*** Change dir to specific implementation dir of db.
+
+```txt
+cd specific_db_dir
+```
+
+> **Dir's :** `sqlite`, `mysql`, `psql`
+
+```sh
+# eg. assuming in root
+cd sqlite
+```
+
+Than, **Follow *`db-dir`* specific** `usage.md` or See links below 👇.
+
+### 🔗 Links
+
+- ***Read*** [`sqlite usage`](sqlite/usage.md) `<<<` for sqlite databases.
+- ***Read*** [`mysql usage`](mysql/usage.md) `<<<` for mysql databases.
+- ***Read*** [`psql usage`](psql/usage.md) `<<<` for postgresql databases.
+
+> **`Note :`** This repository is organized into `dedicated folders` for different relational databases, each following a consistent file structure. While the structure remains uniform, internal code adjustments are made to accommodate the specific nuances of each RDBMS.
+
+## 📚 References
+
+- [Understanding ER Diagrams](https://cs50.harvard.edu/sql/2024/notes/1/#entity-relationship-diagrams)
+- [Mermaid Syntax - ER Diagrams](https://mermaid.js.org/syntax/entityRelationshipDiagram.html)

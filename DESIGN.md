@@ -1,6 +1,6 @@
 # Design Document
 
-By Sunil Sharma
+By Sunil Sharma `CS50S Final Submission`
 
 Video overview: [EMS - Youtube Video](https://youtu.be/CRT4_j3kZes)
 
@@ -174,7 +174,7 @@ All insertion in `reports` handled by trigger (`update_status_end_final_score_al
 
 The below entity relationship diagram describes the relationships among the entities in the database.
 
-![ER Diagram](erDiagram-old.png)
+![ER Diagram](assets/erDiagram-old.png)
 
 As detailed by the diagram:
 
