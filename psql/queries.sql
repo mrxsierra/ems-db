@@ -96,6 +96,7 @@ SELECT * FROM "events";
 SELECT * FROM "results";
 SELECT * FROM "reports";
 
+-- $$$testbreak
 -- UPDATE/SELECT SECTION
 
 -- some updates

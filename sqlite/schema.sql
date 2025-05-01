@@ -82,7 +82,7 @@ CREATE TABLE "tests_sessions" (
     "id" INTEGER,
     "test_id" INTEGER,
     "student_id" INTEGER,
-    "start" NUMERIC NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "start" NUMERIC NOT NULL DEFAULT (DATETIME('now', 'localtime')),
     "end" NUMERIC, -- trigger added.
     "duration_taken" NUMERIC, -- trigger added
     "status" TEXT NOT NULL DEFAULT 'in-progress' CHECK (
@@ -110,7 +110,7 @@ CREATE TABLE "proctoring_sessions" (
     "id" INTEGER,
     "proctor_id" INTEGER,
     "test_session_id" INTEGER,
-    "start" NUMERIC NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "start" NUMERIC NOT NULL DEFAULT (DATETIME('now', 'localtime')),
     "end" NUMERIC, -- trigger added
     "status" TEXT NOT NULL DEFAULT 'active' CHECK (
         "status" IN ('active', 'completed')
@@ -134,7 +134,7 @@ CREATE TABLE "events" (
             'suspicious-behavior'
         )
     ),
-    "timestamp" NUMERIC NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "timestamp" NUMERIC NOT NULL DEFAULT (DATETIME('now', 'localtime')),
     "description" TEXT DEFAULT 'OK',
     PRIMARY KEY ("id"),
     FOREIGN KEY ("proctoring_session_id") REFERENCES "proctoring_sessions" (
@@ -178,12 +178,11 @@ CREATE TRIGGER "set_end_for_test_session" AFTER INSERT ON "tests_sessions"
 BEGIN
 UPDATE "tests_sessions"
 SET
-    "end" = STRFTIME(
-        '%Y-%m-%d %H:%M:%S', 'now', '+' || (
-            SELECT "tests"."duration" FROM "tests"
-            WHERE "tests"."id" = new.'id'
-        )
-    )
+    "end" = DATETIME(new.start, '+' || (
+            SELECT TIME(duration)
+            FROM "tests" AS t
+            WHERE t."id" = new."test_id"
+        ))
 WHERE "id" = new.id;
 END;
 
@@ -234,13 +233,8 @@ UPDATE "tests_sessions"
 SET
     "duration_taken"
     = CASE
-        WHEN STRFTIME('%s', 'now') < STRFTIME('%s', new.start) THEN '00:00:00'
-        ELSE
-            STRFTIME(
-                '%H:%M:%S',
-                DATETIME('now', 'localtime'),
-                '-' || (STRFTIME('%s', new.start) || ' seconds')
-            )
+        WHEN STRFTIME('%s', 'now', 'localtime') < STRFTIME('%s', new.start) THEN '00:00:00' -- Or handle error/impossibility
+        ELSE STRFTIME('%H:%M:%S', DATETIME(STRFTIME('%s', 'now', 'localtime') - STRFTIME('%s', new.start), 'unixepoch'))
     END
 WHERE "id" = new.id;
 
@@ -257,7 +251,7 @@ VALUES
 
 -- Update end time and status for proctoring session
 UPDATE "proctoring_sessions"
-SET "end" = CURRENT_TIMESTAMP, "status" = 'completed'
+SET "end" = (DATETIME('now', 'localtime')), "status" = 'completed'
 WHERE "id" = new.id;
 
 --  add reports for test session

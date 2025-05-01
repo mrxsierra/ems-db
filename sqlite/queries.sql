@@ -1,3 +1,4 @@
+-- Part 1 Initial Insertion
 -- INSERT/DELETE data from tables(reset-tables)
 DELETE FROM reports;
 
@@ -80,7 +81,7 @@ VALUES (1, 1, 3),
 (2, 1, 1),
 (2, 2, 5);
 
--- SELECT SECTION
+-- DB State after Part 1 Execution
 -- some SELECT queries on all tables
 SELECT *
 FROM students;
@@ -112,7 +113,9 @@ FROM results;
 SELECT *
 FROM reports;
 
--- UPDATE/SELECT SECTION
+-- $$$testbreak
+
+-- UPDATE/SELECT SECTION part 2
 -- some updates
 UPDATE tests_sessions
 SET status = 'completed'
@@ -122,7 +125,7 @@ UPDATE tests_sessions
 SET status = 'ended'
 WHERE id = 2;
 
--- recheck update
+-- Recheck test session update State
 SELECT *
 FROM tests_sessions;
 
@@ -133,7 +136,7 @@ FROM proctoring_sessions;
 INSERT INTO events (proctoring_session_id, type, description)
 VALUES (2, 'suspicious-behavior', 'not present in front of screen');
 
--- rechack events
+-- Rechack events, results and reports state after suspicious beahaviour
 SELECT *
 FROM events;
 
@@ -143,7 +146,7 @@ FROM results;
 SELECT *
 FROM reports;
 
--- QUERIES of Interest
+-- QUERIES of Interest [check db state using views]
 -- Find all submissions given student first and last name
 -- EXPLAIN QUERY PLAN
 SELECT *

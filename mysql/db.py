@@ -70,6 +70,8 @@ file_handler = logging.FileHandler("cpy-errors.log")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
+TEST_COMPLETION_TIME = 3  # in seconds
+
 # .env file variables
 MYSQL_DATABASE = os.environ.get("MYSQL_DATABASE", default="ems")
 MYSQL_HOST = os.environ.get("MYSQL_HOST", default="db")
@@ -94,13 +96,17 @@ db_config = {
 config = {**conn_config, **db_config}
 
 
-def create_database():
+def create_database() -> None:
+    """Create database if it doesn't exist"""
+    cnx = None
+    cursor = None
     try:
         logger.info("Creating database: %s", MYSQL_DATABASE)
         cnx = mysql.connect(**conn_config)
+
         cursor = cnx.cursor()
         cursor.execute(f"CREATE DATABASE `{MYSQL_DATABASE}`;")
-        cursor.fetchall()
+        # NO fetch nedded cursor.fetchall()
     except mysql.Error as err:
         if err.errno == errorcode.ER_DB_CREATE_EXISTS:
             logger.info("Database already exists")
@@ -109,9 +115,11 @@ def create_database():
             raise
     finally:
         logger.info("Database created successfully.")
-        cursor.close()
-        cnx.commit()
-        cnx.close()
+        if cursor:
+            cursor.close()
+        if cnx:
+            cnx.commit()
+            cnx.close()
 
 
 def connect_to_mysql(
@@ -158,6 +166,7 @@ def connect_to_mysql(
             # progressive reconnect delay
             time.sleep(delay**attempt)
             attempt += 1
+    logger.info("Failed to connect, exiting without a connection.")
     return None
 
 
@@ -228,55 +237,55 @@ def create_schema(name: str = "ems") -> None:
         name (str): database name
     """
     db = get_cursor()
-    db.execute("SHOW DATABASES;")
-    # db.execute(f"USE `{name}`;")
-    print("Databases in MySQL server:")
-    pretty_list(db.fetchall())
+    print("Connected to MYSQL server.")
     db.execute("SHOW TABLES;")
     tables = db.fetchall()
     if not tables:
         logger.info(f"Database `{name}` is empty. No tables found.")
-        # Open and read the SQL file
-        logger.info(
-            "Creating `tables`, `triggers`, `indexes`, and `views` in `%s` database "
-            "using `schema.sql` file",
-            name,
-        )
         run_create_schema_subprocess()
-        # with open("schema.sql", "r") as schema:
-        #     schema_statements = schema.read()
-        # for statement in schema_statements.split(";"):
-        #     if statement.strip():
-        #         try:
-        #             db.execute(statement)
-        #             try:
-        #                 db.fetchall()
-        #             except mysql.InterfaceError:
-        #                 pass
-        #         except mysql.Error as err:
-        #             if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-        #                 logger.info("Table already exists")
-        #                 continue
-        #             if err.errno == errorcode.ER_BAD_TABLE_ERROR:
-        #                 continue
         db.execute("SHOW TABLES")
         tables = db.fetchall()
 
-    print(f"Tables in `{name}` the database (count:{len(tables)}):")
-    pretty_list(tables)
+    logger.info(f"Tables created in `{name}` database (count:{len(tables)})")
     db.close()  # Close the cursor before committing
     cnx.commit()
 
 
 def pretty_print_table(cursor, state):
     # Fetch all rows from the cursor
-    rows = cursor.fetchall()
+    try:
+        rows = cursor.fetchall()
+    except mysql.ProgrammingError:
+        rows = None
     if rows:
         # Get the column names from the cursor description
         headers = [description[0] for description in cursor.description]
         # Print the table using tabulate
         print(f"\n\n{state}")
         print(tb(rows, headers, tablefmt="grid"))
+
+
+def execute_and_print(sql_script, script_name=""):
+    """Executes SQL queries from a script string and prints results."""
+    print(f"\n--- Executing {script_name} ---")
+    for query in sql_script.strip().split(";"):
+        if query.strip():  # Ensure query is not empty
+            try:
+                cursor = get_cursor()
+                cursor.execute(query)
+                # Only print if it's a SELECT statement or potentially modifies data
+                # (heuristic: check if cursor.description is set after execute)
+                if cursor.description:
+                    pretty_print_table(cursor, query.strip())
+                else:
+                    # For non-SELECT, print the query itself for context
+                    print(f"\n\nEXECUTED: {query.strip()}")
+            except mysql.Error as e:
+                logger.error(f"Error executing query: {query.strip()}\n{e}")
+            finally:
+                cursor.close()
+                cnx.commit()
+    logger.info(f"{script_name} executed successfully.")
 
 
 def insert_and_update(name: str):
@@ -291,23 +300,49 @@ def insert_and_update(name: str):
     with open("queries.sql", "r") as queries:
         queries_statements = queries.read()
 
-    cursor = get_cursor()
-    for statement in queries_statements.split(";"):
-        if statement.strip():
-            try:
-                cursor.execute(statement)
-                pretty_print_table(cursor, statement.strip())
-            except mysql.IntegrityError as ierr:
-                logger.info("Data already exists: %s", ierr)
-                pass
-            except mysql.Error as err:
-                logger.info("Error executing query: %s", err)
-                raise
-    cursor.close()
-    cnx.commit()
+    query_parts = queries_statements.split("$$$testbreak")
+    sql_queries_part1 = query_parts[0]
+    sql_queries_part2 = query_parts[1] if len(query_parts) > 1 else ""
+
+    # Execute the first part of the queries script
+    execute_and_print(sql_queries_part1, "Queries Part 1 (Inserts/Selects)")
+
+    time.sleep(TEST_COMPLETION_TIME)
+    logger.info(
+        f"Sleeping for {TEST_COMPLETION_TIME} seconds to mimic test completion..."
+    )
+
+    # Execute the second part of the queries script (if it exists)
+    if sql_queries_part2:
+        execute_and_print(sql_queries_part2, "Queries Part 2 (Updates/Selects)")
+
+    logger.info("Data inserted and updated successfully.")
+
+    logger.info("Bye from ems-db!")
+    print("Further Explore Using `psql Shell`")
+
+    try:
+        cursor = get_cursor()
+        # After schema creation, re-fetch tables
+        cursor.execute("SHOW DATABASES;")
+        databases = cursor.fetchall()
+        pretty_list(databases)
+        # After schema creation, re-fetch tables
+        cursor.execute("SHOW TABLES;")
+        tables = cursor.fetchall()
+        print(f"Tables in `{name}` the database (count:{len(tables)}):")
+        pretty_list(tables)
+    except mysql.Error as e:
+        logger.error(f"Could not fetch table names: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if cnx:
+            cnx.commit()
 
 
 if __name__ == "__main__":
     create_schema(MYSQL_DATABASE)
     insert_and_update(MYSQL_DATABASE)
-    cnx.close()
+    if cnx:
+        cnx.close()

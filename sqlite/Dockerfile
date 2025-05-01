@@ -1,6 +1,7 @@
-# syntax=docker/dockerfile:1
+# Global variables
 ARG PYTHON_VERSION=3.13
 
+# ------------------- Base build stage ------------------------- 
 # Use a specific uv version tag for better reproducibility
 FROM ghcr.io/astral-sh/uv:debian-slim AS base
 
@@ -25,8 +26,24 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
+# --- Set root password (SECURITY RISK!) ---
+# WARNING: Hardcoding passwords is insecure. Use only for local dev.
+# Replace 'your_secure_root_password' with a password you choose.
+# RUN echo 'root:your_secure_root_password' | chpasswd
+
 # ------------------------ Development Stage ------------------------------
 FROM base AS dev
+
+# Create a non-root user for development (best practice for isolation)
+# useradd pass flag `-p "your_dev_user_pass"` if require
+ARG DEV_UID=1000
+ARG DEV_GID=1000
+RUN groupadd --gid ${DEV_GID} devuser && \
+    useradd --uid ${DEV_UID} --gid ${DEV_GID} \
+    --create-home devuser
+
+# Default User and Workdir
+USER devuser
 WORKDIR /app
 
 # Copy only project definition files initially for efficient caching
@@ -38,15 +55,11 @@ RUN --mount=type=cache,id=uv-cache-dev-ems-sqlite-${PYTHON_VERSION},target=/root
     --mount=type=bind,source=uv.lock,target=uv.lock \
     uv sync --frozen
 
+# Change ownership of the created venv to the future devuser UID/GID
+# RUN chown -R ${DEV_UID}:${DEV_GID} /app/.venv
+
 # Copy the rest of the application code
 COPY . .
-
-# Create a non-root user for development (best practice for isolation)
-ARG DEV_UID=1000
-ARG DEV_GID=1000
-RUN groupadd --gid ${DEV_GID} devuser && \
-    useradd --uid ${DEV_UID} --gid ${DEV_GID} --create-home devuser
-USER devuser
 
 # Automatically activate the virtual environment on container start
 RUN echo "source /app/.venv/bin/activate" >> /home/devuser/.bashrc

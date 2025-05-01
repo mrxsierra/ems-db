@@ -31,6 +31,7 @@ DROP TYPE IF EXISTS "proctoring_session_status_type";
 DROP TYPE IF EXISTS "tests_session_status_type";
 
 -- CREATE TABLES
+-- SET TIME ZONE LOCAL;
 
 -- Represents students taking the test
 CREATE TABLE IF NOT EXISTS "students" (
@@ -86,8 +87,8 @@ CREATE TABLE IF NOT EXISTS "tests_sessions" (
     "id" SERIAL,
     "test_id" INT,
     "student_id" INT,
-    "start" TIMESTAMP NOT NULL DEFAULT now(),
-    "end" TIMESTAMP, -- trigger added.
+    "start" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "end" TIMESTAMP WITH TIME ZONE, -- trigger added.
     "duration_taken" INTERVAL, -- changed from TIME to INTERVAL
     "status" "tests_session_status_type" NOT NULL DEFAULT 'in-progress',
     PRIMARY KEY("id"),
@@ -113,8 +114,8 @@ CREATE TABLE IF NOT EXISTS "proctoring_sessions" (
     "id" SERIAL,
     "proctor_id" INT,
     "test_session_id" INT,
-    "start" TIMESTAMP NOT NULL DEFAULT now(),
-    "end" TIMESTAMP, -- trigger added
+    "start" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "end" TIMESTAMP WITH TIME ZONE, -- trigger added
     "status" "proctoring_session_status_type" NOT NULL DEFAULT 'active',
     PRIMARY KEY("id"),
     FOREIGN KEY("test_session_id") REFERENCES "tests_sessions"("id"),
@@ -129,7 +130,7 @@ CREATE TABLE IF NOT EXISTS "events" (
     "id" SERIAL,
     "proctoring_session_id" INT,
     "type" "events_type" NOT NULL,
-    "timestamp" TIMESTAMP NOT NULL DEFAULT now(),
+    "timestamp" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "description" VARCHAR(32) DEFAULT 'OK',
     PRIMARY KEY("id"),
     FOREIGN KEY("proctoring_session_id") REFERENCES "proctoring_sessions"("id")
@@ -225,7 +226,8 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.status IN ('ended', 'completed') AND OLD.status NOT IN ('ended', 'completed') THEN
         -- Set the duration taken based on the tests duration
-        NEW.duration_taken := now() - NEW.start;
+        -- Add parentheses back to clock_timestamp() for function call
+        NEW.duration_taken := clock_timestamp() - NEW.start; 
 
         -- Add event for test session
         INSERT INTO "events" ("proctoring_session_id", "type")
@@ -239,9 +241,10 @@ BEGIN
         LIMIT 1;
 
         -- Update end time and status for proctoring session
+        -- clock_timestamp without () is correct here in the UPDATE SET clause
         UPDATE "proctoring_sessions"
         SET
-            "end" = now(),
+            "end" = clock_timestamp(), 
             "status" = 'completed'
         WHERE
             "test_session_id" = NEW.id
@@ -328,3 +331,4 @@ CREATE INDEX "idx_questions" ON "questions" ("test_id", "id");
 CREATE INDEX "idx_events" ON "events" ("type");
 
 -- check errors
+SET TIME ZONE LOCAL;

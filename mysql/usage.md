@@ -95,7 +95,7 @@ mysql -t -v -uroot -psecret ems
 ```sh title="mysql shell"
 source ./schema.sql
 # or direct cli equivalent
-mysql -t -uroot -psecret ems < ./schema.sql
+mysql -tv -uroot -psecret ems < ./schema.sql
 ```
 
 > **Note :** CMD `.read` is `mysql shell` CMD for `sql` file batch execution.
@@ -106,7 +106,7 @@ mysql -t -uroot -psecret ems < ./schema.sql
 # Explore database
 source ./queries.sql
 # or direct cli equivalent
-mysql -t -uroot -psecret ems < ./queries.sql
+mysql -tv -uroot -psecret ems < ./queries.sql
 ```
 
 #### `Exit` ***mysql Shell Session***

@@ -117,6 +117,8 @@ docker compose exec db mysql -t -v -uroot -psecret ems
 docker ps -a
 # available images
 docker images
+# as a root user
+docker compose exec -u root app bash 
 # help
 docker --help
 ```

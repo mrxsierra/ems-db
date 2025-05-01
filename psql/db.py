@@ -50,7 +50,7 @@ using SQL scripts.
 import logging
 import os
 import subprocess
-import time
+from time import sleep
 
 import psycopg as psql
 from tabulate import tabulate as tb
@@ -69,6 +69,9 @@ logger.addHandler(handler)
 file_handler = logging.FileHandler("cpy-errors.log")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+
+# In Seconds
+TEST_COMPLETION_TIME = 3
 
 # .env file variables
 POSTGRES_DATABASE = os.environ.get("POSTGRES_DATABASE", default="ems")
@@ -95,11 +98,13 @@ config = {**conn_config, **db_config}
 
 
 def create_database() -> None:
+    """Create database if it doesn't exist"""
     cnx = None
     cursor = None
     try:
         logger.info("Creating database: %s", POSTGRES_DATABASE)
         cnx = psql.connect(**conn_config)
+
         cursor = cnx.cursor()
         cursor.execute(f"CREATE DATABASE {POSTGRES_DATABASE};")
         # No fetchall() needed for CREATE DATABASE
@@ -148,7 +153,7 @@ def connect_to_psql(config: dict, attempts: int = 3, delay: int = 2) -> psql.Con
             logger.info(
                 "Connection failed: %s. Retrying (%d/%d)...", e, attempt, attempts
             )
-            time.sleep(delay**attempt)
+            sleep(delay**attempt)
         attempt += 1
     logger.info("Failed to connect, exiting without a connection.")
     return None
@@ -223,8 +228,7 @@ def create_schema(name: str = "ems") -> None:
         )
         tables = db.fetchall()
 
-    print(f"Tables in `{name}` the database (count:{len(tables)}):")
-    pretty_list(tables)
+    logger.info(f"Tables created in `{name}` database (count:{len(tables)})")
     db.close()  # Close the cursor before committing
     cnx.commit()
 
@@ -243,6 +247,29 @@ def pretty_print_table(cursor, state):
         print(tb(rows, headers, tablefmt="grid"))
 
 
+def execute_and_print(sql_script, script_name=""):
+    """Executes SQL queries from a script string and prints results."""
+    print(f"\n--- Executing {script_name} ---")
+    for query in sql_script.strip().split(";"):
+        if query.strip():  # Ensure query is not empty
+            try:
+                cursor = cnx.cursor()
+                cursor.execute(query)
+                # Only print if it's a SELECT statement or potentially modifies data
+                # (heuristic: check if cursor.description is set after execute)
+                if cursor.description:
+                    pretty_print_table(cursor, query.strip())
+                else:
+                    # For non-SELECT, print the query itself for context
+                    print(f"\n\nEXECUTED: {query.strip()}")
+            except psql.Error as e:
+                logger.error(f"Error executing query: {query.strip()}\n{e}")
+            finally:
+                cursor.close()
+                cnx.commit()
+    logger.info(f"{script_name} executed successfully.")
+
+
 def insert_and_update(name: str):
     """Insert and update data in the database
     - Show tables data.
@@ -255,23 +282,48 @@ def insert_and_update(name: str):
     with open("queries.sql", "r") as queries:
         queries_statements = queries.read()
 
-    cursor = cnx.cursor()
-    for statement in queries_statements.split(";"):
-        if statement.strip():
-            try:
-                cursor.execute(statement)
-                pretty_print_table(cursor, statement.strip())
-            except psql.IntegrityError as ierr:
-                logger.info("Data already exists: %s", ierr)
-                pass
-            except psql.Error as err:
-                logger.info("Error executing query: %s", err)
-                raise
-    cursor.close()
-    cnx.commit()
+    query_parts = queries_statements.split("$$$testbreak")
+    sql_queries_part1 = query_parts[0]
+    sql_queries_part2 = query_parts[1] if len(query_parts) > 1 else ""
+
+    # Execute the first part of the queries script
+    execute_and_print(sql_queries_part1, "Queries Part 1 (Inserts/Selects)")
+
+    sleep(TEST_COMPLETION_TIME)
+    logger.info(
+        f"Sleeping for {TEST_COMPLETION_TIME} seconds to mimic test completion..."
+    )
+
+    # Execute the second part of the queries script (if it exists)
+    if sql_queries_part2:
+        execute_and_print(sql_queries_part2, "Queries Part 2 (Updates/Selects)")
+
+    logger.info("Data inserted and updated successfully.")
+
+    logger.info("Bye from ems-db!")
+    print("Further Explore Using `psql Shell`")
+
+    try:
+        # After schema creation, re-fetch tables
+        cursor = cnx.cursor()
+        cursor.execute(
+            "SELECT table_name FROM \
+                information_schema.tables WHERE table_schema = 'public';"
+        )
+        tables = cursor.fetchall()
+        print(f"Tables in `{name}` the database (count:{len(tables)}):")
+        pretty_list(tables)
+    except psql.Error as e:
+        logger.error(f"Could not fetch table names: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if cnx:
+            cnx.commit()
 
 
 if __name__ == "__main__":
     create_schema(POSTGRES_DATABASE)
     insert_and_update(POSTGRES_DATABASE)
-    cnx.close()
+    if cnx:
+        cnx.close()

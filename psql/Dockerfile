@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
-ARG PYTHON_VERSION=3.13
+ARG PYTHON_VERSION
 
+# ------------------- Base build stage ------------------------- 
 # Use a specific uv version tag for better reproducibility
 FROM ghcr.io/astral-sh/uv:0.6.16-debian-slim AS base
 
@@ -31,9 +32,49 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
+# --- Set root password (SECURITY RISK!) ---
+# WARNING: Hardcoding passwords is insecure. Use only for local dev.
+# Replace 'your_secure_root_password' with a password you choose.
+# RUN echo 'root:your_secure_root_password' | chpasswd
 
 # -------------------- Development Stage ------------------------
 FROM base AS dev
+
+# Create a non-root user for development (best practice for isolation)
+# useradd -p flag can be used for pass
+ARG USER
+ARG DEV_UID
+ARG DEV_GID
+ARG PGHOST
+ARG PGPORT
+ARG PGDATABASE
+ARG PGUSER
+ARG PGPASSWORD
+
+RUN groupadd --gid ${DEV_GID} devuser && \
+    useradd --uid ${DEV_UID} --gid ${DEV_GID} --create-home devuser
+
+# Automatically activate the virtual environment on container start
+# Best way for credentials saving at root dir with restrictive access
+# \npassword=$PGPASSWORD
+RUN for file in ~/.bashrc /home/${USER}/.bashrc; do \
+    echo "source /app/.venv/bin/activate" >> $file && \
+    echo "export PGSERVICE=my$PGHOST" >> $file; \
+    done && \
+    for file in ~/.pg_service.conf /home/${USER}/.pg_service.conf; do \
+    echo "[my${PGHOST}]\nhost=$PGHOST\nport=$PGPORT\ndbname=$PGDATABASE\nuser=$PGUSER" >> $file; \
+    done && \ 
+    for file in ~/.pgpass /home/${USER}/.pgpass; do \
+    echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" >> $file; \
+    chmod 600 $file; \
+    done && \
+    chown ${USER}:${DEV_GID} /home/${USER}/.pgpass
+
+# Not ideal but work in dev env
+# ENV PGPASSWORD="secret"
+
+# Default
+USER ${USER}
 WORKDIR /app
 
 # Copy only project definition files initially for efficient caching
@@ -47,23 +88,6 @@ RUN --mount=type=cache,id=uv-cache-dev-ems-psql-${PYTHON_VERSION},target=/root/.
 
 # Copy the rest of the application code
 COPY . .
-
-# Create a non-root user for development (best practice for isolation)
-ARG DEV_UID=1000
-ARG DEV_GID=1000
-RUN groupadd --gid ${DEV_GID} devuser && \
-    useradd --uid ${DEV_UID} --gid ${DEV_GID} --create-home devuser
-USER devuser
-
-# Automatically activate the virtual environment on container start
-RUN echo "source /app/.venv/bin/activate" >> /home/devuser/.bashrc
-
-# best way for credentials saving at root dir with restrictive access
-RUN touch ~/.pgpass && echo db:5432:ems:postgres:secret > ~/.pgpass \
-    && chmod 600 ~/.pgpass
-
-# Not ideal but work in dev env
-# ENV PGPASSWORD="secret"
 
 # Default command to keep the development container running
 CMD ["tail", "-f", "/dev/null"]

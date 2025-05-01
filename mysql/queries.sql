@@ -93,14 +93,18 @@ SELECT * FROM events;
 SELECT * FROM results;
 SELECT * FROM reports;
 
+-- $$$testbreak
+
+-- Simulate a delay of 5 seconds
+SELECT SLEEP(3);
+
+--- $$$sleeptestbreak
+
 -- UPDATE/SELECT SECTION
 -- Update test session status
 UPDATE tests_sessions
 SET status = 'completed'
 WHERE id = 1;
-
--- Simulate a delay of 5 seconds
-SELECT SLEEP(5);
 
 -- Update test session status
 UPDATE tests_sessions

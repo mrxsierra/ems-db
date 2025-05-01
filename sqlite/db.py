@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+from time import sleep
 
 from tabulate import tabulate as tb
 
@@ -18,6 +19,8 @@ file_handler = logging.FileHandler("cpy-errors.log")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
+TEST_COMPLETION_TIME = 3  # in seconds
+
 
 def pretty_print_table(cursor, name=""):
     # Fetch all rows from the cursor
@@ -30,6 +33,25 @@ def pretty_print_table(cursor, name=""):
     # Print the table using tabulate
     print(f"\n\nSTATEMENT: {name}")
     print(tb(rows, headers, tablefmt="grid"))
+
+
+def execute_and_print(cursor, sql_script, script_name=""):
+    """Executes SQL queries from a script string and prints results."""
+    print(f"\n--- Executing {script_name} ---")
+    for query in sql_script.strip().split(";"):
+        if query.strip():  # Ensure query is not empty
+            try:
+                cursor.execute(query)
+                # Only print if it's a SELECT statement or potentially modifies data
+                # (heuristic: check if cursor.description is set after execute)
+                if cursor.description:
+                    pretty_print_table(cursor, query.strip())
+                else:
+                    # For non-SELECT, print the query itself for context
+                    print(f"\n\nEXECUTED: {query.strip()}")
+            except sqlite3.Error as e:
+                logger.error(f"Error executing query: {query.strip()}\n{e}")
+    logger.info(f"{script_name} executed successfully.")
 
 
 def create_database_and_tables():
@@ -63,49 +85,68 @@ def create_database_and_tables():
     # Create a cursor object
     cursor = connection.cursor()
 
-    # Open and read the SQL file
-    with open("schema.sql", "r") as sql_file:
-        sql_schema_script = sql_file.read()
-
-    # Execute the SQL scripts for creating tables and inserting data
-    cursor.executescript(sql_schema_script)
-    logger.info("Tables created successfully.")
+    # Open and read the SQL file for schema
+    try:
+        with open("schema.sql", "r") as sql_file:
+            sql_schema_script = sql_file.read()
+        # Execute the SQL scripts for creating tables
+        cursor.executescript(sql_schema_script)
+        logger.info("Tables created successfully.")
+    except FileNotFoundError:
+        logger.error("schema.sql not found. Cannot create tables.")
+        connection.close()
+        return
+    except sqlite3.Error as e:
+        logger.error(f"Error executing schema script: {e}")
+        connection.close()
+        return
 
     print("\n\nLet's Insert Some Data replicating user flow: ...")
 
-    # Open and read the SQL file
-    with open("queries.sql", "r") as sql_file:
-        sql_queries_script = sql_file.read()
+    # Open and read the SQL file for queries
+    try:
+        with open("queries.sql", "r") as sql_file:
+            sql_queries_full_script = sql_file.read()
+    except FileNotFoundError:
+        logger.error("queries.sql not found. Cannot insert/update data.")
+        connection.close()
+        return
 
-    # Execute the SQL scripts for inserting data
-    for query in sql_queries_script.split(";"):
-        cursor.execute(query)
-        pretty_print_table(cursor, query)
-    logger.info("Data inserted and updated sucessfully .")
+    # Split the queries script
+    query_parts = sql_queries_full_script.split("$$$testbreak")
+    sql_queries_part1 = query_parts[0]
+    sql_queries_part2 = query_parts[1] if len(query_parts) > 1 else ""
 
-    # fetch some tables
-    cursor.execute("SELECT * FROM students")
-    pretty_print_table(cursor, "Students")
+    # Execute the first part of the queries script
+    execute_and_print(cursor, sql_queries_part1, "Queries Part 1 (Inserts/Selects)")
 
-    cursor.execute("SELECT * FROM tests")
-    pretty_print_table(cursor, "Tests")
+    sleep(TEST_COMPLETION_TIME)
+    logger.info(
+        f"Sleeping for {TEST_COMPLETION_TIME} seconds to mimic test completion..."
+    )
 
-    cursor.execute("SELECT * FROM tests_sessions")
-    pretty_print_table(cursor, "Tests Sessions")
+    # Execute the second part of the queries script (if it exists)
+    if sql_queries_part2:
+        execute_and_print(cursor, sql_queries_part2, "Queries Part 2 (Updates/Selects)")
+
+    logger.info("Data inserted and updated successfully.")
 
     logger.info("Bye from ems-db!")
     print("Further Explore Using `sqlite3 Shell`")
 
     # Query the sqlite_master table to get table names
-    result = cursor.execute(
-        "SELECT name from sqlite_master where type = 'table' or type = 'view';"
-    )
-    tables = [row[0] for row in result]
+    try:
+        result = cursor.execute(
+            "SELECT name from sqlite_master where type = 'table' or type = 'view';"
+        )
+        tables = [row[0] for row in result]
 
-    # Print the list of tables
-    print("Tables in the database:")
-    for table in tables:
-        print(f"- {table}")
+        # Print the list of tables
+        print("\nTables in the database:")
+        for table in tables:
+            print(f"- {table}")
+    except sqlite3.Error as e:
+        logger.error(f"Could not fetch table names: {e}")
 
     # Commit the transaction (if required)
     connection.commit()

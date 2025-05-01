@@ -7,9 +7,12 @@ services:
       - 80:80
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: ${TZ:-Asia/Kolkata}
   
   # app service
   app:
+    user: ${USER:-devuser}
     build:
       context: .
       target: dev
@@ -17,19 +20,25 @@ services:
         PYTHON_VERSION: ${PYTHON_VERSION:-3.13}
         DEV_UID: ${USERID:-1000} # Use host user ID for better file permissions
         DEV_GID: ${GROUPID:-1000} # Use host group ID
+        MYSQL_USER: ${MYSQL_USER:-root}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+        MYSQL_HOST: ${MYSQL_HOST:-db}
+        MYSQL_DATABASE: ${MYSQL_DATABASE:-ems}
+
     command: ["tail", "-f", "/dev/null"]
     ports:
       - 3000:3000
     env_file:
       - .env
     # environment:
+      # TZ: ${TZ:-Asia/Kolkata} # Use host group ID
       # MYSQL_HOST: db
       # MYSQL_USER: root
       # MYSQL_PASSWORD: secret
       # MYSQL_DATABASE: ems
     volumes:
       - .:/app:rw # Mount project for live updates
-      - dev-venv-ems-mysql:/app/.venv # Named volume for the virtual environment
+      - dev-venv-ems-mysql:/app/.venv:rw # Named volume for the virtual environment
     working_dir: /app
     develop:
       watch:
@@ -52,32 +61,52 @@ services:
     labels:
       traefik.http.routers.backend.rule: Host(`localhost`)
       traefik.http.services.backend.loadbalancer.server.port: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+
         
   ## MySQL database Service
   db:
     image: mysql:9
+    restart: always
+    # ports:
+    #   - 3306:3306
     working_dir: /app
     volumes:
+      - ./.my.cnf:/root/.my.cnf:rw ## for auto login database has to specify
       - ems-mysql-data:/var/lib/mysql
       - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./queries.sql:/docker-entrypoint-initdb.d/02-queries.sql
       - ./schema.sql:/app/schema.sql
       - ./queries.sql:/app/queries.sql
     environment: 
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: ems
+      TZ: ${TZ:-Asia/Kolkata}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ems}
       # MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    healthcheck:
+      test: ["CMD", "mysql", "-hlocalhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 3s
+      timeout: 10s
+      retries: 50
+      start_period: 10s
   
   # phpMyAdmin Service
   # This service provides a web interface for managing the MySQL database.
   phpmyadmin:
     image: phpmyadmin
     environment:
-      PMA_HOST: db
-      PMA_USER: root
-      PMA_PASSWORD: secret
+      TZ: ${TZ:-Asia/Kolkata}
+      PMA_HOST: ${MYSQL_HOST:-db}
+      PMA_USER: ${MYSQL_USER:-root}
+      PMA_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      PMA_DATABASE: ${MYSQL_DATABASE:-ems}
+    depends_on:
+      db:
+        condition: service_healthy
     labels:
-      traefik.http.routers.phpmyadmin.rule: Host(`db.localhost`)
+      traefik.http.routers.phpmyadmin.rule: Host(`${MYSQL_HOST:-db}.localhost`)
       traefik.http.services.phpmyadmin.loadbalancer.server.port: 80
 
 # Define the named volume for the virtual environment

@@ -111,6 +111,8 @@ docker compose exec app sqlite3 ems.db -table -echo
 docker ps
 # available images
 docker images
+# as a root user
+docker compose exec -u root app bash 
 # help
 docker --help
 ```
