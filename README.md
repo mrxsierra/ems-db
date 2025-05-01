@@ -20,6 +20,8 @@ ems-db:             # root {WorkDir}
 ```sh
 # Common Files
 WorkDir: root/[sqlite, mysql, psql]
+├───|- ./tests/
+        |- test_db.py       # pytest
     |- .dockerignore        ---   
     |- .gitignore             |  
     |- .python-version        |
