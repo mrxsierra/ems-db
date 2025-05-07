@@ -184,7 +184,7 @@ All insertion in `reports` handled by trigger (`update_status_end_final_score_al
 
 The below entity relationship diagram describes the relationships among the entities in the database.
 
-![ER Diagram](/erDiagram-old.png)
+![ER Diagram](/assets/erDiagram-old.png)
 
 As detailed by the diagram:
 
