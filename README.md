@@ -52,7 +52,7 @@ The database is tailored to handle the core processes of test management, includ
 - **Flexibility:** Support complex proctoring scenarios and large-scale test monitoring.
 - **Modularity:** Designed for multi-database support with consistent file structures.
 
-> ***Read*** [`design.md`](/design.md) `<<<` For more details.
+> ***Read*** [`design.md`](/DESIGN.md) `<<<` For more details.
 
 ## 🤔 Structural Overview
 
