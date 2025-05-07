@@ -108,7 +108,7 @@ docker compose exec db mysql -t -v -uroot -psecret ems
 \q
 ```
 
-> `For More` continue reading mysql [`usage.md`](usage.md) | [#Getting Started Section](usage.md#first-activate-venv).
+> `For More` continue reading mysql [`usage.md`](/usage.md) | [#Getting Started Section](usage.md#first-activate-venv).
 
 ### Help Commands
 

@@ -52,13 +52,13 @@ The database is tailored to handle the core processes of test management, includ
 - **Flexibility:** Support complex proctoring scenarios and large-scale test monitoring.
 - **Modularity:** Designed for multi-database support with consistent file structures.
 
-> ***Read*** [`design.md`](design.md) `<<<` For more details.
+> ***Read*** [`design.md`](/design.md) `<<<` For more details.
 
 ## 🤔 Structural Overview
 
 The following sections provide a detailed walkthrough of the database relationships, with special emphasis on complex entities like **PROCTORING_SESSIONS** and their connections to **PROCTORS**, **TESTS_SESSIONS**, and **EVENTS**.
 
-![ER-Diagram](assets/erDiagram.png)
+![ER-Diagram](/assets/erDiagram.png)
 
 ---
 
@@ -193,12 +193,12 @@ Than, **Follow *`db-dir`* specific** `usage.md` or See links below 👇.
 ### 🔗 Links
 
 - ***Read Usage***
-    - [`sqlite usage`](sqlite/usage.md)
-    - [`mysql usage`](mysql/usage.md)
-    - [`psql usage`](psql/usage.md)
+    - [`sqlite usage`](/sqlite/usage.md)
+    - [`mysql usage`](/mysql/usage.md)
+    - [`psql usage`](/psql/usage.md)
 - ***Read & Study Docs for differences across dbs***
-    - [`Schema differences`](docs/1-schema-diff.md)
-    - [`Query & Interection differences`](docs/2-query-interection-diff.md)
+    - [`Schema differences`](/docs/1-schema-diff.md)
+    - [`Query & Interection differences`](/docs/2-query-interection-diff.md)
 
 > **`Note :`** This repository is organized into `dedicated folders` for different relational databases, each following a consistent file structure. While the structure remains uniform, internal code adjustments are made to accommodate the specific nuances of each RDBMS.
 

@@ -7,19 +7,19 @@ This companion blog post will use the **`queries.sql`, `README.Docker.md`, and `
 
 > If you missed the first part on schema definitions, you can catch up here:
 
-- [Navigating the Nuances: A Developer's Guide to SQL Dialects (SQLite, MySQL, PostgreSQL)](1-schema_diff.md).
+- [Navigating the Nuances: A Developer's Guide to SQL Dialects (SQLite, MySQL, PostgreSQL)](/1-schema_diff.md).
 
 This post will serve as another handy reference, highlighting the practical differences you'll encounter when running queries and managing these databases, especially useful for both day-to-day development and for showcasing practical database skills.
 
 > **Drill**
 >
 > - ***Warning :** Refer to `Official Docs`, when in doubt. **`"Its not ultimate source of truth. It could be good starting point."`***
-> - ***Understanding :*** Use [project](https://github.com/mrxsierra/ems-db/) as reference.
+> - ***Understanding :*** Use [this project](https://github.com/mrxsierra/ems-db/) as reference.
 > - ***Prerequisites :*** Familiar with `sql syntax`, `client interection`, `Docker`, and `Python` (languge of choice).
 
 # Beyond the Schema: A Practical Guide to Querying and Interacting with SQLite, MySQL, & PostgreSQL
 
-In our [previous post](1-schema_diff.md), we explored the key differences in schema definitions across `SQLite`, `MySQL`, and `PostgreSQL` using the [Exam Management System (EMS)](https://github.com/mrxsierra/ems-db/) project as a case study.
+In our [previous post](/1-schema_diff.md), we explored the key differences in schema definitions across `SQLite`, `MySQL`, and `PostgreSQL` using the [Exam Management System (EMS)](https://github.com/mrxsierra/ems-db/) project as a case study.
 
 Now, let's shift our focus to the equally important aspects of how we *interact* with these databases: ***running queries, using their command-line interfaces (CLIs), and understanding connection nuances, especially in a Dockerized environment.***
 
