@@ -139,7 +139,7 @@ The basic syntax for `INSERT`, `UPDATE`, and `DELETE` is highly standardized. Th
     DELETE FROM reports;
     ```
 
-> ***Identifier quoting :*** `Double quotes for SQLite/PostgreSQL`, `backticks for MySQL` discussed in the [schema blog](/docs/1-schema_diff.md#1-dropping-objects-tables-views-indexes) post also applies here.
+> ***Identifier quoting :*** `Double quotes for SQLite/PostgreSQL`, `backticks for MySQL` discussed in the [schema blog](./1-schema-diff.md#1-dropping-objects-tables-views-indexes) post also applies here.
 
 ### 5. Querying Data & Analysis (SELECT, EXPLAIN)
 
