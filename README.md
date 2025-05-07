@@ -198,7 +198,7 @@ Than, **Follow *`db-dir`* specific** `usage.md` or See links below 👇.
     - [`psql usage`](/psql/usage.md)
 - ***Read & Study Docs for differences across dbs***
     - [`Schema differences`](/docs/1-schema-diff.md)
-    - [`Query & Interection differences`](/docs/2-query-interection-diff.md)
+    - [`Query & Interaction differences`](/docs/2-query-interaction-diff.md)
 
 > **`Note :`** This repository is organized into `dedicated folders` for different relational databases, each following a consistent file structure. While the structure remains uniform, internal code adjustments are made to accommodate the specific nuances of each RDBMS.
 

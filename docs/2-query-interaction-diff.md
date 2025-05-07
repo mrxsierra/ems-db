@@ -15,7 +15,7 @@ This post will serve as another handy reference, highlighting the practical diff
 >
 > - ***Warning :** Refer to `Official Docs`, when in doubt. **`"Its not ultimate source of truth. It could be good starting point."`***
 > - ***Understanding :*** Use [this project](https://github.com/mrxsierra/ems-db/) as reference.
-> - ***Prerequisites :*** Familiar with `sql syntax`, `client interection`, `Docker`, and `Python` (languge of choice).
+> - ***Prerequisites :*** Familiar with `sql syntax`, `client interaction`, `Docker`, and `Python` (language of choice).
 
 # Beyond the Schema: A Practical Guide to Querying and Interacting with SQLite, MySQL, & PostgreSQL
 

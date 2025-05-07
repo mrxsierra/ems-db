@@ -21,7 +21,7 @@ The purpose of the database is to manage a system for conducting tests and exami
 
 ***"The database focuses on managing the administration, execution, and monitoring of tests and examinations and focus only some core process of making tests sets of multiple option questions."***
 
-> ***Warning :*** Database is not designed to handle all aspects of educational management. *eg. like **user log acitivity, notifying user, finacial aspects, subjective answer type and many other aspect of proctoring and adminstration.***
+> ***Warning :*** Database is not designed to handle all aspects of educational management. *eg. like **user log activity, notifying user, financial aspects, subjective answer type and many other aspect of proctoring and administration.***
 
 ## Functional Requirements
 
@@ -153,7 +153,7 @@ The `events` table includes the following attributes:
 
 Having said that now!.. `NOT NULL` constraint only applies to all excepts `description` which has `DEFAULT` value `OK`, which only needed to be changed, IN case when `type` (which has check constraint (`started-test`, `completed-test`, `ended-test`, `suspicious-behavior`) and has `DEFAULT` value `started-test`), which is updated to `suspicious-behavior` which can be done manually.
 
-Now in case when student have no `suspicious-behavior`. then in that case `status` is normally updated to `ended` or `completed` based on `status` of `tests_sessions` and decription has `DEFAULT` value `OK` to indiacate normal activity.
+Now in case when student have no `suspicious-behavior`. then in that case `status` is normally updated to `ended` or `completed` based on `status` of `tests_sessions` and decription has `DEFAULT` value `OK` to indicate normal activity.
 
 #### Results
 
@@ -166,7 +166,7 @@ The `results` table includes the following attributes:
 * `score`: Indicates the score obtained for the question (0 for incorrect, 1 for correct). It is of type `INTEGER` and has a `CHECK` constraint to ensure valid values.
 * `feedback`: Provides feedback related to the answer. It is of type `TEXT`.
 
-ALL the answer of test question is stored in `answer` attributes which takes `questions_options` table `id`'s with `test_session_id` and `question_id` REFERENCES. `score` and `feedback` is handled by trigger(`set_score_of_result`) which is based on `is_coorect` column for `score` to check if it's correct option or not, and `feedback` is based on correctness `score` (i.e `is_correct`) such that if option is incorrect feedback is set to `need-improvement` else `great`. `NOT NULL` constraint is applied to all excepts `feedback`.
+ALL the answer of test question is stored in `answer` attributes which takes `questions_options` table `id`'s with `test_session_id` and `question_id` REFERENCES. `score` and `feedback` is handled by trigger(`set_score_of_result`) which is based on `is_correct` column for `score` to check if it's correct option or not, and `feedback` is based on correctness `score` (i.e `is_correct`) such that if option is incorrect feedback is set to `need-improvement` else `great`. `NOT NULL` constraint is applied to all excepts `feedback`.
 
 #### Reports
 
@@ -219,7 +219,7 @@ Several optimizations were made in the schema:
 
 ### ***Views***
 
-* Views were created to simplify querying for common tasks. For example, the `tests_history` view provides a consolidated view of students' test performance history, while the `test_questions_option_search` view simplifies searching for tests and their associated questions and options and `test_sessions_suspicious_behaviour_search` view provides tests sessions where suspicious activity occured.
+* Views were created to simplify querying for common tasks. For example, the `tests_history` view provides a consolidated view of students' test performance history, while the `test_questions_option_search` view simplifies searching for tests and their associated questions and options and `test_sessions_suspicious_behaviour_search` view provides tests sessions where suspicious activity occurred.
 * This views help in abstracting complex queries into simpler, reusable forms, enhancing the database's usability and reducing the complexity of queries for end-users.
 
 > ***These optimizations were implemented to improve the overall performance and usability of the database system by reducing query execution time and simplifying the querying process.***
@@ -232,7 +232,7 @@ The current schema focuses only on some core process of test conducting, report 
 
 > * [`README.md`](/README.md) `<<<` For explore more details about the project.
 > * [`1-schema-diff.md`](/docs/1-schema-diff.md) `<<<` for schema related differences.
-> * [`2-query-interection-diff.md`](/docs/2-query-interection-diff.md) `<<<` for query related differences.
+> * [`2-query-interaction-diff.md`](/docs/2-query-interaction-diff.md) `<<<` for query related differences.
 
 ## Conclusion
 
