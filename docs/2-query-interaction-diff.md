@@ -7,7 +7,7 @@ This companion blog post will use the **`queries.sql`, `README.Docker.md`, and `
 
 > If you missed the first part on schema definitions, you can catch up here:
 
-- [Navigating the Nuances: A Developer's Guide to SQL Dialects (SQLite, MySQL, PostgreSQL)](/1-schema-diff.md).
+- [Navigating the Nuances: A Developer's Guide to SQL Dialects (SQLite, MySQL, PostgreSQL)](/docs/1-schema-diff.md).
 
 This post will serve as another handy reference, highlighting the practical differences you'll encounter when running queries and managing these databases, especially useful for both day-to-day development and for showcasing practical database skills.
 
@@ -19,7 +19,7 @@ This post will serve as another handy reference, highlighting the practical diff
 
 # Beyond the Schema: A Practical Guide to Querying and Interacting with SQLite, MySQL, & PostgreSQL
 
-In our [previous post](/1-schema-diff.md), we explored the key differences in schema definitions across `SQLite`, `MySQL`, and `PostgreSQL` using the [Exam Management System (EMS)](https://github.com/mrxsierra/ems-db/) project as a case study.
+In our [previous post](/docs/1-schema-diff.md), we explored the key differences in schema definitions across `SQLite`, `MySQL`, and `PostgreSQL` using the [Exam Management System (EMS)](https://github.com/mrxsierra/ems-db/) project as a case study.
 
 Now, let's shift our focus to the equally important aspects of how we *interact* with these databases: ***running queries, using their command-line interfaces (CLIs), and understanding connection nuances, especially in a Dockerized environment.***
 
@@ -139,7 +139,7 @@ The basic syntax for `INSERT`, `UPDATE`, and `DELETE` is highly standardized. Th
     DELETE FROM reports;
     ```
 
-> ***Identifier quoting :*** `Double quotes for SQLite/PostgreSQL`, `backticks for MySQL` discussed in the [schema blog](./1-schema-diff.md#1-dropping-objects-tables-views-indexes) post also applies here.
+> ***Identifier quoting :*** `Double quotes for SQLite/PostgreSQL`, `backticks for MySQL` discussed in the [schema blog](/docs/1-schema-diff.md#1-dropping-objects-tables-views-indexes) post also applies here.
 
 ### 5. Querying Data & Analysis (SELECT, EXPLAIN)
 
