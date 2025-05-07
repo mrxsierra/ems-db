@@ -8,10 +8,11 @@ The Exam Management System database is designed to streamline the process of con
 
 ```sh
 ems-db:             # root {WorkDir}
-├───assets          # MISC          
-├───mysql
-├───psql
-├───sqlite
+├───/assets          # MISC          
+├───/docs            # Docs - study guide          
+├───/mysql
+├───/psql
+├───/sqlite
 ├───DESIGN.md       # Schema Def
 ├───design.mmd      # Mermaid Schema def
 └───README.md
@@ -191,9 +192,13 @@ Than, **Follow *`db-dir`* specific** `usage.md` or See links below 👇.
 
 ### 🔗 Links
 
-- ***Read*** [`sqlite usage`](sqlite/usage.md) `<<<` for sqlite databases.
-- ***Read*** [`mysql usage`](mysql/usage.md) `<<<` for mysql databases.
-- ***Read*** [`psql usage`](psql/usage.md) `<<<` for postgresql databases.
+- ***Read Usage***
+    - [`sqlite usage`](sqlite/usage.md)
+    - [`mysql usage`](mysql/usage.md)
+    - [`psql usage`](psql/usage.md)
+- ***Read & Study Docs for differences across dbs***
+    - [`Schema differences`](docs/1-schema-diff.md)
+    - [`Query & Interection differences`](docs/2-query-interection-diff.md)
 
 > **`Note :`** This repository is organized into `dedicated folders` for different relational databases, each following a consistent file structure. While the structure remains uniform, internal code adjustments are made to accommodate the specific nuances of each RDBMS.
 

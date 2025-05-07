@@ -18,6 +18,8 @@ Whether you're a fellow developer looking for a quick reference or trying to gau
 
 Let's dive into the specific areas where these `SQL dialects` diverge:
 
+> ***Drill***
+>
 > - ***Warning :** Refer to `Official Docs`, when in doubt. **`"Its not ultimate source of truth. It could be good starting point."`***
 > - ***Understanding :*** Use [project](https://github.com/mrxsierra/ems-db/) as reference.
 > - ***Prerequisites :*** Familiar with `sql syntax`, `client interection`, `Docker`, and `Python` (languge of choice).
@@ -379,7 +381,7 @@ The basic syntax is similar, but quoting and specific features (like conditional
 
 > ***For Debunking** `sql queries` and `clients interation` differences b/w SQLite, MySQL, and PostgreSQL,*
 
-- `Part-2` **[Beyond the Schema: A Practical Guide to Querying and Interacting with SQLite, MySQL, & PostgreSQL](/docs/query_interection_diff.md)**
+- `Part-2` **[Beyond the Schema: A Practical Guide to Querying and Interacting with SQLite, MySQL, & PostgreSQL](/docs/2-query-interection-diff.md)**
 
 > **Note :** It's build upon where this post left.
 
