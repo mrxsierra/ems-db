@@ -58,7 +58,7 @@ This is a significant area of divergence.
 | **Duration/Interval**| `NUMERIC` (e.g., storing time as text 'HH:MM:SS') | `INTERVAL`                                     | `TIME` (for durations within 24h) or calculate |
 | **ENUM Types**      | Simulated with `CHECK` constraint: `CHECK ("status" IN (...))` | Native: `CREATE TYPE "events_type" AS ENUM (...);` | Native: `status ENUM ('active', 'completed')`   |
 
-**Example: Students Table ID**
+> **Example: Students Table ID**
 
 - **SQLite:**
 
