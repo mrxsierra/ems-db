@@ -4,7 +4,7 @@ As developers, we often encounter various SQL databases, each with its own flavo
 
 **Recently**, while working on an [***`Exam Management System (EMS)`***](https://github.com/mrxsierra/ems-db/), I had the opportunity to define the database schema for `SQLite`, `MySQL`, and `PostgreSQL`. This exercise highlighted some fascinating and crucial differences between these popular relational database management systems (RDBMS).
 
-> **Note :** This post aims to serve as a practical guide and a bit of a cheatsheet, drawing directly from the `schema` files of project.
+> **`ℹ️Note` :** **This post aims to serve as a `practical guide` and a bit of a `cheatsheet`, drawing `insights` directly from the `schema` files of project.**
 
 ***Project Repo :*** [ems-db](https://github.com/mrxsierra/ems-db/) **`<-- root-dir-name`**
 
@@ -19,8 +19,8 @@ Whether you're a fellow developer looking for a quick reference or trying to gau
 Let's dive into the specific areas where these `SQL dialects` diverge:
 
 > ***Drill***
+>>**`⚠️Warning` :** ***Refer to `Official Docs`, when in doubt. `"Its not ultimate source of truth. It could be good starting point."`***
 >
-> - ***Warning :** Refer to `Official Docs`, when in doubt. **`"Its not ultimate source of truth. It could be good starting point."`***
 > - ***Understanding :*** Use [project](https://github.com/mrxsierra/ems-db/) as reference.
 > - ***Prerequisites :*** Familiar with `sql syntax`, `client interaction`, `Docker`, and `Python` (language of choice).
 
@@ -377,7 +377,7 @@ The basic syntax is similar, but quoting and specific features (like conditional
 - **Practical Experience:** It often indicates hands-on experience with multiple databases, which is a valuable asset in diverse tech environments.
 - **Problem-Solving:** The ability to adapt a schema or queries for different SQL dialects showcases problem-solving skills.
 
-## Next Read
+## Next Read 📖
 
 > ***For Debunking** `sql queries` and `clients interaction` differences b/w SQLite, MySQL, and PostgreSQL,*
 
@@ -395,9 +395,9 @@ I hope this comparative overview helps you in your database endeavors! ***Happy 
 
 ---
 
-> ***Disclaimer** : The examples are drawn from specific schema files and might not cover every single difference or advanced feature of each RDBMS.*
+> ***Disclaimer*** : *The examples are drawn from specific project files and general knowledge. Always refer to the official documentation for the most comprehensive and up-to-date information.*
 
-## References & Resources
+## References & Resources 🔗
 
 This section compiles useful links found within the [`ems-db`](https://github.com/mrxsierra/ems-db/) project's documentation (`usage.md`, `README.Docker.md` files), categorized for easier navigation.
 
